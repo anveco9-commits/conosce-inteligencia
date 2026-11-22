@@ -8,7 +8,4 @@ df = pd.read_excel(
 )
 
 print("FILAS:", len(df))
-print("COLUMNAS:", len(df.columns))
-
-print("COLUMNAS ENCONTRADAS:")
-print(df.columns.tolist())
+print(df.head())
