@@ -1,6 +1,16 @@
-import os
+from sqlalchemy import create_engine
 
-print("DB_HOST =", os.getenv("DB_HOST"))
-print("DB_NAME =", os.getenv("DB_NAME"))
-print("DB_USER =", os.getenv("DB_USER"))
-print("DB_PORT =", os.getenv("DB_PORT"))
+host = "ep-red-cell-bdd49h0q-pooler.c-8.us-east-2.aws.neon.tech"
+database = "neondb"
+user = "neondb_owner"
+password = "npg_KUCFxuvDW46f"
+port = "5432"
+
+cadena = (
+    f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"
+)
+
+engine = create_engine(cadena)
+
+with engine.connect() as conexion:
+    print("CONEXION EXITOSA A NEON")
