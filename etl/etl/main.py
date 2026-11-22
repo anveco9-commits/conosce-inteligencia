@@ -1,16 +1,10 @@
-from sqlalchemy import create_engine
+import pandas as pd
 
-host = "ep-red-cell-bdd49h0q-pooler.c-8.us-east-2.aws.neon.tech"
-database = "neondb"
-user = "neondb_owner"
-password = "npg_KUCFxuvDW46f"
-port = "5432"
+url = "https://conosce.osce.gob.pe/buscador/assets/67ae6c4a/reportes/convocatorias/2026/CONVOCATORIAS2026_0.xlsx"
 
-cadena = (
-    f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"
+df = pd.read_excel(
+    url,
+    engine="openpyxl"
 )
 
-engine = create_engine(cadena)
-
-with engine.connect() as conexion:
-    print("CONEXION EXITOSA A NEON")
+print(df.dtypes)
