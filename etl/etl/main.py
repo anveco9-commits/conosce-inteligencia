@@ -1,11 +1,17 @@
-import pandas as pd
+import os
+from sqlalchemy import create_engine
 
-url = "https://conosce.osce.gob.pe/buscador/assets/67ae6c4a/reportes/convocatorias/2026/CONVOCATORIAS2026_0.xlsx"
+host = os.getenv("DB_HOST")
+database = os.getenv("DB_NAME")
+user = os.getenv("DB_USER")
+password = os.getenv("DB_PASSWORD")
+port = os.getenv("DB_PORT")
 
-df = pd.read_excel(
-    url,
-    engine="openpyxl"
+cadena = (
+    f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"
 )
 
-print("FILAS:", len(df))
-print(df.head())
+engine = create_engine(cadena)
+
+with engine.connect() as conexion:
+    print("CONEXION EXITOSA A NEON")
