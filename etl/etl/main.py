@@ -1,10 +1,14 @@
-import requests
+import pandas as pd
 
-url = "https://bi.seace.gob.pe/pentaho/api/repos/%3Apublic%3Aportal/redirect.html/content?userid=public&password=key&url=aHR0cHM6Ly9jb25vc2NlLm9zY2UuZ29iLnBlL2J1c2NhZG9yL2Fzc2V0cy82N2FlNmM0YS9yZXBvcnRlcy9jb252b2NhdG9yaWFzLzIwMjYvQ09OVk9DQVRPUklBUzIwMjZfMC54bHN4"
+url = "https://conosce.osce.gob.pe/buscador/assets/67ae6c4a/reportes/convocatorias/2026/CONVOCATORIAS2026_0.xlsx"
 
-r = requests.get(url)
+df = pd.read_excel(
+    url,
+    engine="openpyxl"
+)
 
-print("STATUS:", r.status_code)
-print("TIPO:", r.headers.get("content-type"))
+print("FILAS:", len(df))
+print("COLUMNAS:", len(df.columns))
 
-print(r.text[:1000])
+print("COLUMNAS ENCONTRADAS:")
+print(df.columns.tolist())
