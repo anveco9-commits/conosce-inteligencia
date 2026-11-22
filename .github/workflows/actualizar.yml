@@ -1,0 +1,12 @@
+name: Actualizar CONOSCE
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prueba:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Probar flujo
+        run: echo "Flujo creado correctamente"
