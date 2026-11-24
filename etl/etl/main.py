@@ -41,3 +41,4 @@ df = df.merge(
 )
 
 print("POSTORES CAJAMARCA:", len(df))
+print(df.head())
