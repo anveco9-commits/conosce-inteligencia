@@ -28,6 +28,11 @@ df = df.rename(columns={
     "FECHA_PRESENTACION_PROPUESTA": "fecha_presentacion"
 })
 
+df["codigo_convocatoria"] = df["codigo_convocatoria"].astype(str)
+
+convocatorias["codigo_convocatoria"] = (
+    convocatorias["codigo_convocatoria"].astype(str)
+)
 # Mantener solo Cajamarca
 df = df.merge(
     convocatorias[["codigo_convocatoria"]],
