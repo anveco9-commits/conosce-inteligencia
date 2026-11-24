@@ -46,6 +46,8 @@ df["clave_proceso_item"] = (
     + df["n_item"].astype(str)
 )
 
+df = df[df["departamento_item"] == "CAJAMARCA"]
+print("REGISTROS CAJAMARCA:", len(df))
 # Mantener SOLO columnas que existen en PostgreSQL
 df = df[
     [
