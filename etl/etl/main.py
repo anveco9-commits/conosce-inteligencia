@@ -43,43 +43,43 @@ df = df.rename(columns={
 df["clave_proceso_item"] = (
     df["codigo_convocatoria"].astype(str)
     + "-"
-    + df["n_elemento"].astype(str)
+    + df["n_item"].astype(str)
 )
 
-# Mantener únicamente columnas existentes en PostgreSQL
-columnas_destino = [
-    "codigo_convocatoria",
-    "entidad_ruc",
-    "entidad",
-    "objeto_contractual",
-    "tipo_proceso",
-    "servicio",
-    "monto_referencial",
-    "fecha_convocatoria",
-    "fecha_integracion",
-    "fecha_presentacion",
-    "clave_proceso_item",
-    "codigo_entidad",
-    "tipo_entidad",
-    "descripcion_proceso",
-    "proceso",
-    "tipo_compra",
-    "sector_nivel_gobierno",
-    "sistema_contratacion",
-    "n_elemento",
-    "descripcion_elemento",
-    "unidad_medida",
-    "estado_item",
-    "paquete",
-    "codigo_elemento",
-    "moneda",
-    "monto_elemento_referencial",
-    "departamento_item",
-    "provincia_item",
-    "distrito_item"
+# Mantener SOLO columnas que existen en PostgreSQL
+df = df[
+    [
+        "codigo_convocatoria",
+        "entidad_ruc",
+        "entidad",
+        "objeto_contractual",
+        "tipo_proceso",
+        "servicio",
+        "monto_referencial",
+        "fecha_convocatoria",
+        "fecha_integracion",
+        "fecha_presentacion",
+        "clave_proceso_item",
+        "codigo_entidad",
+        "tipo_entidad",
+        "descripcion_proceso",
+        "proceso",
+        "tipo_compra",
+        "sector_nivel_gobierno",
+        "sistema_contratacion",
+        "n_item",
+        "descripcion_item",
+        "unidad_medida",
+        "estado_item",
+        "paquete",
+        "codigo_item_cubso",
+        "moneda",
+        "monto_referencial_item",
+        "departamento_item",
+        "provincia_item",
+        "distrito_item"
+    ]
 ]
-
-df = df[columnas_destino]
 
 # Conexión Neon
 engine = create_engine(
