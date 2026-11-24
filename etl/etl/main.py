@@ -9,10 +9,11 @@ convocatorias = pd.read_sql(
     FROM fact_convocatoria
     """,
     create_engine(
-        "postgresql+psycopg2://neondb_owner:npg_KUCFxuvDW46f@ep-red-cell-bdd49h0q-pooler.c-8.us-east-2.aws.neon.tech:5432/neondb"
+        "postgresql+psycopg2://neondb_owner:npg_KUCFxuvDW46f@ep-red-cell-bdd49h0q-pooler.c-8.us-east-2.aws.neon.tech:5432/neondb"?sslmode=require
     )
-)
 
+with engine.connect() as conn:
+    print("CONEXION EXITOSA")
 # Archivo postores
 url = "https://conosce.osce.gob.pe/buscador/assets/67ae6c4a/reportes/postor/2026/POSTOR2026_0.xlsx"
 
