@@ -40,5 +40,37 @@ df = df.merge(
     how="inner"
 )
 
-print("POSTORES CAJAMARCA:", len(df))
-print(df.head())
+# Conexión Neon
+engine = create_engine(
+    "postgresql+psycopg2://neondb_owner:TU_CONTRASEÑA@ep-red-cell-bdd49h0q-pooler.c-8.us-east-2.aws.neon.tech:5432/neondb"
+)
+
+# Limpiar tabla
+with engine.begin() as conn:
+    conn.exec_driver_sql(
+        "TRUNCATE TABLE fact_postor RESTART IDENTITY"
+    )
+
+# Seleccionar columnas finales
+df = df[
+    [
+        "codigo_convocatoria",
+        "n_item",
+        "ruc_postor",
+        "postor",
+        "fecha_convocatoria",
+        "fecha_presentacion"
+    ]
+]
+
+# Cargar
+df.to_sql(
+    "fact_postor",
+    engine,
+    if_exists="append",
+    index=False,
+    chunksize=1000,
+    method="multi"
+)
+
+print("POSTORES CARGADOS:", len(df))
