@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 # URL CONOSCE
 url = "https://conosce.osce.gob.pe/buscador/assets/67ae6c4a/reportes/convocatorias/2026/CONVOCATORIAS2026_0.xlsx"
 
-# Leer archivo
+# Leer Excel
 df = pd.read_excel(url, engine="openpyxl")
 
 # Renombrar columnas
@@ -47,46 +47,46 @@ df["clave_proceso_item"] = (
 )
 
 # Mantener únicamente columnas existentes en PostgreSQL
-df = df[
-    [
-        "codigo_convocatoria",
-        "entidad_ruc",
-        "entidad",
-        "objeto_contractual",
-        "tipo_proceso",
-        "servicio",
-        "monto_referencial",
-        "fecha_convocatoria",
-        "fecha_integracion",
-        "fecha_presentacion",
-        "clave_proceso_item",
-        "codigo_entidad",
-        "tipo_entidad",
-        "descripcion_proceso",
-        "proceso",
-        "tipo_compra",
-        "sector_nivel_gobierno",
-        "sistema_contratacion",
-        "n_elemento",
-        "descripcion_elemento",
-        "unidad_medida",
-        "estado_item",
-        "paquete",
-        "codigo_elemento",
-        "moneda",
-        "monto_elemento_referencial",
-        "departamento_item",
-        "provincia_item",
-        "distrito_item"
-    ]
+columnas_destino = [
+    "codigo_convocatoria",
+    "entidad_ruc",
+    "entidad",
+    "objeto_contractual",
+    "tipo_proceso",
+    "servicio",
+    "monto_referencial",
+    "fecha_convocatoria",
+    "fecha_integracion",
+    "fecha_presentacion",
+    "clave_proceso_item",
+    "codigo_entidad",
+    "tipo_entidad",
+    "descripcion_proceso",
+    "proceso",
+    "tipo_compra",
+    "sector_nivel_gobierno",
+    "sistema_contratacion",
+    "n_elemento",
+    "descripcion_elemento",
+    "unidad_medida",
+    "estado_item",
+    "paquete",
+    "codigo_elemento",
+    "moneda",
+    "monto_elemento_referencial",
+    "departamento_item",
+    "provincia_item",
+    "distrito_item"
 ]
+
+df = df[columnas_destino]
 
 # Conexión Neon
 engine = create_engine(
     "postgresql+psycopg2://neondb_owner:npg_KUCFxuvDW46f@ep-red-cell-bdd49h0q-pooler.c-8.us-east-2.aws.neon.tech:5432/neondb"
 )
 
-# Vaciar tabla antes de cargar
+# Vaciar tabla
 with engine.begin() as conn:
     conn.exec_driver_sql(
         "TRUNCATE TABLE fact_convocatoria RESTART IDENTITY"
