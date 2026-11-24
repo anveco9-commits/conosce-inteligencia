@@ -1,19 +1,20 @@
 import pandas as pd
 from sqlalchemy import create_engine
 
+# Conexión Neon
+engine = create_engine(
+    "postgresql+psycopg2://neondb_owner:npg_KUCFxuvDW46f@ep-red-cell-bdd49h0q-pooler.c-8.us-east-2.aws.neon.tech:5432/neondb?sslmode=require"
+)
+
 # Convocatorias Cajamarca ya cargadas
 convocatorias = pd.read_sql(
     """
-    SELECT codigo_convocatoria,
-           clave_proceso_item
+    SELECT codigo_convocatoria
     FROM fact_convocatoria
     """,
-    create_engine(
-        "postgresql+psycopg2://neondb_owner:npg_KUCFxuvDW46f@ep-red-cell-bdd49h0q-pooler.c-8.us-east-2.aws.neon.tech:5432/neondb"?sslmode=require
-    )
+    engine
+)
 
-with engine.connect() as conn:
-    print("CONEXION EXITOSA")
 # Archivo postores
 url = "https://conosce.osce.gob.pe/buscador/assets/67ae6c4a/reportes/postor/2026/POSTOR2026_0.xlsx"
 
@@ -29,28 +30,16 @@ df = df.rename(columns={
     "FECHA_PRESENTACION_PROPUESTA": "fecha_presentacion"
 })
 
+# Convertir tipos para hacer el cruce
 df["codigo_convocatoria"] = df["codigo_convocatoria"].astype(str)
+convocatorias["codigo_convocatoria"] = convocatorias["codigo_convocatoria"].astype(str)
 
-convocatorias["codigo_convocatoria"] = (
-    convocatorias["codigo_convocatoria"].astype(str)
-)
-# Mantener solo Cajamarca
+# Mantener solo procesos de Cajamarca
 df = df.merge(
     convocatorias[["codigo_convocatoria"]],
     on="codigo_convocatoria",
     how="inner"
 )
-
-# Conexión Neon
-engine = create_engine(
-    "postgresql+psycopg2://neondb_owner:TU_CONTRASEÑA@ep-red-cell-bdd49h0q-pooler.c-8.us-east-2.aws.neon.tech:5432/neondb"
-)
-
-# Limpiar tabla
-with engine.begin() as conn:
-    conn.exec_driver_sql(
-        "TRUNCATE TABLE fact_postor RESTART IDENTITY"
-    )
 
 # Seleccionar columnas finales
 df = df[
@@ -64,7 +53,13 @@ df = df[
     ]
 ]
 
-# Cargar
+# Limpiar tabla
+with engine.begin() as conn:
+    conn.exec_driver_sql(
+        "TRUNCATE TABLE fact_postor RESTART IDENTITY"
+    )
+
+# Cargar datos
 df.to_sql(
     "fact_postor",
     engine,
