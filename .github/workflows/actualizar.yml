@@ -2,7 +2,9 @@ name: Actualizar CONOSCE
 
 on:
   workflow_dispatch:
-
+  
+  schedule:
+    - cron: '0 11 * * *'
 jobs:
   conectar-neon:
     runs-on: ubuntu-latest
