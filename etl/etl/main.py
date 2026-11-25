@@ -23,14 +23,11 @@ df = pd.read_excel(url, engine="openpyxl")
 # Renombrar columnas
 df = df.rename(columns={
     "CODIGOCONVOCATORIA": "codigo_convocatoria",
-    "N_ITEM": "n_item",
-    "RUC PROVEEDOR": "ruc_proveedor",
-    "PROVEEDOR": "proveedor",
-    "MONTO_REFERENCIAL_ITEM_SOLES": "monto_referencial_item_soles",
-    "MONTO_ADJUDICADO_ITEM_SOLES": "monto_adjudicado_item_soles",
-    "FECHA_CONVOCATORIA": "fecha_convocatoria",
-    "FECHA_BUENAPRO": "fecha_buenapro",
-    "FECHA_CONSENTIMIENTO_BP": "fecha_consentimiento_bp"
+    "N_ITEM": "n_elemento",
+    "RUC PROVEEDOR": "ruc_ganador",
+    "PROVEEDOR": "proveedor_ganador",
+    "MONTO_ADJUDICADO_ITEM_SOLES": "monto_adjudicado",
+    "FECHA_BUENAPRO": "fecha_buena_pro"
 })
 
 # Filtrar Cajamarca
@@ -43,18 +40,23 @@ df = df.merge(
     how="inner"
 )
 
-# Columnas finales
+# Crear clave
+df["clave_proceso_item"] = (
+    df["codigo_convocatoria"].astype(str)
+    + "-"
+    + df["n_elemento"].astype(str)
+)
+
+# Mantener solo columnas existentes en PostgreSQL
 df = df[
     [
         "codigo_convocatoria",
-        "n_item",
-        "ruc_proveedor",
-        "proveedor",
-        "monto_referencial_item_soles",
-        "monto_adjudicado_item_soles",
-        "fecha_convocatoria",
-        "fecha_buenapro",
-        "fecha_consentimiento_bp"
+        "n_elemento",
+        "ruc_ganador",
+        "proveedor_ganador",
+        "monto_adjudicado",
+        "fecha_buena_pro",
+        "clave_proceso_item"
     ]
 ]
 
@@ -64,7 +66,7 @@ with engine.begin() as conn:
         "TRUNCATE TABLE fact_adjudicacion RESTART IDENTITY"
     )
 
-# Cargar
+# Cargar datos
 df.to_sql(
     "fact_adjudicacion",
     engine,
