@@ -23,14 +23,14 @@ df = pd.read_excel(url, engine="openpyxl")
 # Renombrar columnas
 df = df.rename(columns={
     "CODIGOCONVOCATORIA": "codigo_convocatoria",
-    "N_ITEM": "n_elemento",
-    "RUC PROVEEDOR": "ruc_ganador",
-    "PROVEEDOR": "proveedor_ganador",
+    "N_ITEM": "n_item",
+    "RUC PROVEEDOR": "ruc_proveedor",
+    "PROVEEDOR": "proveedor",
     "MONTO_ADJUDICADO_ITEM_SOLES": "monto_adjudicado",
-    "FECHA_BUENAPRO": "fecha_buena_pro"
+    "FECHA_BUENAPRO": "fecha_buenapro"
 })
 
-# Filtrar Cajamarca
+# Filtrar solo Cajamarca
 df["codigo_convocatoria"] = df["codigo_convocatoria"].astype(str)
 convocatorias["codigo_convocatoria"] = convocatorias["codigo_convocatoria"].astype(str)
 
@@ -44,18 +44,18 @@ df = df.merge(
 df["clave_proceso_item"] = (
     df["codigo_convocatoria"].astype(str)
     + "-"
-    + df["n_elemento"].astype(str)
+    + df["n_item"].astype(str)
 )
 
-# Mantener solo columnas existentes en PostgreSQL
+# Mantener columnas de la tabla
 df = df[
     [
         "codigo_convocatoria",
-        "n_elemento",
-        "ruc_ganador",
-        "proveedor_ganador",
+        "n_item",
+        "ruc_proveedor",
+        "proveedor",
         "monto_adjudicado",
-        "fecha_buena_pro",
+        "fecha_buenapro",
         "clave_proceso_item"
     ]
 ]
