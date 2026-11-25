@@ -33,15 +33,45 @@ df = df.rename(columns={
     "FECHA_CONSENTIMIENTO_BP": "fecha_consentimiento_bp"
 })
 
-# Convertir tipos para cruce
+# Filtrar Cajamarca
 df["codigo_convocatoria"] = df["codigo_convocatoria"].astype(str)
 convocatorias["codigo_convocatoria"] = convocatorias["codigo_convocatoria"].astype(str)
 
-# Solo Cajamarca
 df = df.merge(
     convocatorias,
     on="codigo_convocatoria",
     how="inner"
 )
 
-print("ADJUDICACIONES CAJAMARCA:", len(df))
+# Columnas finales
+df = df[
+    [
+        "codigo_convocatoria",
+        "n_item",
+        "ruc_proveedor",
+        "proveedor",
+        "monto_referencial_item_soles",
+        "monto_adjudicado_item_soles",
+        "fecha_convocatoria",
+        "fecha_buenapro",
+        "fecha_consentimiento_bp"
+    ]
+]
+
+# Limpiar tabla
+with engine.begin() as conn:
+    conn.exec_driver_sql(
+        "TRUNCATE TABLE fact_adjudicacion RESTART IDENTITY"
+    )
+
+# Cargar
+df.to_sql(
+    "fact_adjudicacion",
+    engine,
+    if_exists="append",
+    index=False,
+    chunksize=1000,
+    method="multi"
+)
+
+print("ADJUDICACIONES CARGADAS:", len(df))
