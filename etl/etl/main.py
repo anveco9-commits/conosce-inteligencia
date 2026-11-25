@@ -47,6 +47,11 @@ df["clave_proceso_item"] = (
     + df["n_item"].astype(str)
 )
 
+df["fecha_buenapro"] = pd.to_datetime(
+    df["fecha_buenapro"],
+    dayfirst=True,
+    errors="coerce"
+)
 # Mantener columnas de la tabla
 df = df[
     [
