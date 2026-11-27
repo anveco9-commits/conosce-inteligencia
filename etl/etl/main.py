@@ -9,71 +9,69 @@ engine = create_engine(
 # Convocatorias Cajamarca
 convocatorias = pd.read_sql(
     """
-    SELECT codigo_convocatoria
+    SELECT
+        codigo_convocatoria,
+        entidad,
+        descripcion_proceso,
+        provincia_item,
+        distrito_item
     FROM fact_convocatoria
     """,
     engine
 )
 
-# Archivo adjudicaciones
-url = "https://conosce.osce.gob.pe/buscador/assets/67ae6c4a/reportes/adjudicaciones/2026/ADJUDICACIONES2026_0.xlsx"
+# Archivo desiertos
+url = "https://conosce.osce.gob.pe/buscador/assets/67ae6c4a/reportes/desiertos/2026/DESIERTOS2026_0.xlsx"
 
 df = pd.read_excel(url, engine="openpyxl")
 
-# Renombrar columnas
+print(df.columns.tolist())
+
+# Ajustar nombres
 df = df.rename(columns={
-    "CODIGOCONVOCATORIA": "codigo_convocatoria",
-    "N_ITEM": "n_item",
-    "RUC PROVEEDOR": "ruc_proveedor",
-    "PROVEEDOR": "proveedor",
-    "MONTO_ADJUDICADO_ITEM_SOLES": "monto_adjudicado",
-    "FECHA_BUENAPRO": "fecha_buenapro"
+    "CODIGOCONVOCATORIA": "codigo_convocatoria"
 })
 
-# Filtrar solo Cajamarca
+# Convertir a texto
 df["codigo_convocatoria"] = df["codigo_convocatoria"].astype(str)
 convocatorias["codigo_convocatoria"] = convocatorias["codigo_convocatoria"].astype(str)
 
+# Filtrar solo Cajamarca
 df = df.merge(
     convocatorias,
     on="codigo_convocatoria",
     how="inner"
 )
 
-# Crear clave
-df["clave_proceso_item"] = (
-    df["codigo_convocatoria"].astype(str)
-    + "-"
-    + df["n_item"].astype(str)
-)
+# Completar campos faltantes
+if "causal_desierto" not in df.columns:
+    df["causal_desierto"] = None
 
-df["fecha_buenapro"] = pd.to_datetime(
-    df["fecha_buenapro"],
-    dayfirst=True,
-    errors="coerce"
-)
-# Mantener columnas de la tabla
+if "fecha_desierto" not in df.columns:
+    df["fecha_desierto"] = None
+
+# Mantener estructura
 df = df[
     [
         "codigo_convocatoria",
-        "n_item",
-        "ruc_proveedor",
-        "proveedor",
-        "monto_adjudicado",
-        "fecha_buenapro",
-        "clave_proceso_item"
+        "entidad",
+        "descripcion_proceso",
+        "provincia_item",
+        "distrito_item",
+        "causal_desierto",
+        "fecha_desierto"
     ]
 ]
 
 # Limpiar tabla
 with engine.begin() as conn:
     conn.exec_driver_sql(
-        "TRUNCATE TABLE fact_adjudicacion RESTART IDENTITY"
+        "TRUNCATE TABLE fact_desierto RESTART IDENTITY"
     )
 
-# Cargar datos
+# Cargar
 df.to_sql(
-    "fact_adjudicacion",
+    "fact_desierto",
     engine,
     if_exists="append",
     index=False,
@@ -81,4 +79,4 @@ df.to_sql(
     method="multi"
 )
 
-print("ADJUDICACIONES CARGADAS:", len(df))
+print("DESIERTOS CARGADOS:", len(df))
