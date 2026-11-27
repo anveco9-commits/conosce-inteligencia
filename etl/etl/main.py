@@ -20,8 +20,8 @@ convocatorias = pd.read_sql(
     engine
 )
 
-# Archivo desiertos
-url = "https://conosce.osce.gob.pe/buscador/assets/67ae6c4a/reportes/desiertos/2026/DESIERTOS2026_0.xlsx"
+# Archivo nulidades
+url = "https://conosce.osce.gob.pe/buscador/assets/67ae6c4a/reportes/nulos/2026/NULOS2026_0.xlsx"
 
 df = pd.read_excel(url, engine="openpyxl")
 
@@ -32,25 +32,25 @@ df = df.rename(columns={
     "CODIGOCONVOCATORIA": "codigo_convocatoria"
 })
 
-# Convertir a texto
+# Convertir
 df["codigo_convocatoria"] = df["codigo_convocatoria"].astype(str)
 convocatorias["codigo_convocatoria"] = convocatorias["codigo_convocatoria"].astype(str)
 
-# Filtrar solo Cajamarca
+# Filtrar Cajamarca
 df = df.merge(
     convocatorias,
     on="codigo_convocatoria",
     how="inner"
 )
 
-# Completar campos faltantes
-if "causal_desierto" not in df.columns:
-    df["causal_desierto"] = None
+# Campos por defecto
+if "causal_nulidad" not in df.columns:
+    df["causal_nulidad"] = None
 
-if "fecha_desierto" not in df.columns:
-    df["fecha_desierto"] = None
+if "fecha_nulidad" not in df.columns:
+    df["fecha_nulidad"] = None
 
-# Mantener estructura
+# Estructura final
 df = df[
     [
         "codigo_convocatoria",
@@ -58,20 +58,20 @@ df = df[
         "descripcion_proceso",
         "provincia_item",
         "distrito_item",
-        "causal_desierto",
-        "fecha_desierto"
+        "fecha_nulidad",
+        "causal_nulidad"
     ]
 ]
 
 # Limpiar tabla
 with engine.begin() as conn:
     conn.exec_driver_sql(
-        "TRUNCATE TABLE fact_desierto RESTART IDENTITY"
+        "TRUNCATE TABLE fact_nulidad RESTART IDENTITY"
     )
 
 # Cargar
 df.to_sql(
-    "fact_desierto",
+    "fact_nulidad",
     engine,
     if_exists="append",
     index=False,
@@ -79,4 +79,4 @@ df.to_sql(
     method="multi"
 )
 
-print("DESIERTOS CARGADOS:", len(df))
+print("NULIDADES CARGADAS:", len(df))
