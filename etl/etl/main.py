@@ -20,14 +20,14 @@ convocatorias = pd.read_sql(
     engine
 )
 
-# Archivo nulidades
-url = "https://conosce.osce.gob.pe/buscador/assets/67ae6c4a/reportes/nulos/2026/NULOS2026_0.xlsx"
+# Archivo contratos
+url = "https://conosce.osce.gob.pe/buscador/assets/67ae6c4a/reportes/contratos/2026/CONTRATOS2026_0.xlsx"
 
 df = pd.read_excel(url, engine="openpyxl")
 
 print(df.columns.tolist())
 
-# Ajustar nombres
+# Renombrar
 df = df.rename(columns={
     "CODIGOCONVOCATORIA": "codigo_convocatoria"
 })
@@ -44,11 +44,17 @@ df = df.merge(
 )
 
 # Campos por defecto
-if "causal_nulidad" not in df.columns:
-    df["causal_nulidad"] = None
+if "monto_contrato" not in df.columns:
+    df["monto_contrato"] = None
 
-if "fecha_nulidad" not in df.columns:
-    df["fecha_nulidad"] = None
+if "fecha_contrato" not in df.columns:
+    df["fecha_contrato"] = None
+
+if "proveedor" not in df.columns:
+    df["proveedor"] = None
+
+if "ruc_proveedor" not in df.columns:
+    df["ruc_proveedor"] = None
 
 # Estructura final
 df = df[
@@ -58,20 +64,22 @@ df = df[
         "descripcion_proceso",
         "provincia_item",
         "distrito_item",
-        "fecha_nulidad",
-        "causal_nulidad"
+        "monto_contrato",
+        "fecha_contrato",
+        "proveedor",
+        "ruc_proveedor"
     ]
 ]
 
 # Limpiar tabla
 with engine.begin() as conn:
     conn.exec_driver_sql(
-        "TRUNCATE TABLE fact_nulidad RESTART IDENTITY"
+        "TRUNCATE TABLE fact_contrato RESTART IDENTITY"
     )
 
 # Cargar
 df.to_sql(
-    "fact_nulidad",
+    "fact_contrato",
     engine,
     if_exists="append",
     index=False,
@@ -79,4 +87,4 @@ df.to_sql(
     method="multi"
 )
 
-print("NULIDADES CARGADAS:", len(df))
+print("CONTRATOS CARGADOS:", len(df))
